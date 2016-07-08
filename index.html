@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<style>
+			@font-face{
+				font-family: "FrankGoth-BT";
+				src: url(fonts/FrankGoth-BT.ttf);
+			}
+			body {
+				background: black;
+				color: #fff;
+				font-size:16px;
+				font-family: "FrankGoth-BT";
+				margin: 0px;
+			}
+			#logo{
+				margin: 20px;
+				position: absolute;
+			}
+			#logo h1{
+				margin: 0;
+				font-weight: normal;
+				letter-spacing: 1px;
+			}
+			#container{
+				margin: 0 auto;
+				/*text-align: center;*/
+			}
+			#tooltip-container{
+
+			}
+			#tooltip{
+				display: none;
+				position: fixed;
+				width:1px;
+				height: 100px;
+				border-left: solid 1px white;
+				text-align: center;
+			}
+			#tooltip p {
+				margin-top: 100px;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="logo">
+			<h1>rubberband.</h1>
+		</div>
+		<div id="tooltip-container">
+			<div id="tooltip">
+				<p></p>
+			</div>
+		</div>
+
+		<div id="container">
+		</div>
+		<!-- // <script src="../common/scripts/js/three76.js"></script> -->
+		<script src="scripts/js/three.js"></script>
+		<script src="../common/scripts/js/CCapture.min.js"></script>
+		<script src="../common/scripts/js/gif.js"></script>
+		<script src="../common/scripts/js/OrbitControls.js"></script>
+		<script src="../common/scripts/js/Whammy.js"></script>
+		<script src="../common/scripts/js/Utils.js"></script>
+		<script src="../common/scripts/js/TweenMax.min.js"></script>
+		<script src="scripts/js/Detector.js"></script>
+		<script src="scripts/js/Rubberband.js"></script>
+		<script src="scripts/js/projects.js"></script>
+		<script src="scripts/js/traer.js"></script>
+		<script src="scripts/js/main.js"></script>
+	</body>
+</html>
