@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<link href="https://fonts.googleapis.com/css?family=Lato:100,300" rel="stylesheet">
+		<style>
+			@font-face{
+				font-family: "FrankGoth-BT";
+				src: url(fonts/FrankGoth-BT.ttf);
+			}
+			body {
+				background: black;
+				color: #fff;
+				font-size:16px;
+				font-family: "FrankGoth-BT";
+				margin: 0px;
+			}
+			#logo{
+				margin: 20px;
+				position: absolute;
+			}
+			#logo h1{
+				margin: 0;
+				font-weight: normal;
+				letter-spacing: 1px;
+			}
+			#nav{
+				margin: 20px;
+				position: absolute;
+				bottom: 0; 
+				right: 0;
+			}
+			#nav h2{
+				display: inline-block;
+				margin: 0 0 0 10px;
+				font-weight: normal;
+				letter-spacing: 1px;
+			}
+			#container{
+				margin: 0 auto;
+				/*text-align: center;*/
+			}
+			#tooltip-container{
+
+			}
+			#tooltip{
+				display: none;
+				position: fixed;
+				width:0px;
+				height: 100px;
+				border-left: solid 1px white;
+				text-align: center;
+			}
+			#tooltip p {
+				margin-top: 100px;
+				text-align: center;
+				margin-left: -5px;
+			}
+			#project{
+				width: 100vw;
+				height:100vh;
+				position: absolute;
+				background-color: rgba(0,0,0,0.25);
+			}
+			#project iframe{
+				position: absolute;
+				top: 25%;
+				left: 50%;
+				-webkit-transform: translate(-50%, -25%);
+				   -moz-transform: translate(-50%, -25%);
+				    -ms-transform: translate(-50%, -25%);
+				     -o-transform: translate(-50%, -25%);
+				        transform: translate(-50%, -25%);
+			}
+			#project #description{
+				position: absolute;
+				top: 90%;
+				left: 50%;
+				max-width: 640px;
+				-webkit-transform: translate(-50%, -90%);
+				   -moz-transform: translate(-50%, -90%);
+				    -ms-transform: translate(-50%, -90%);
+				     -o-transform: translate(-50%, -90%);
+				        transform: translate(-50%, -90%);
+			}
+			h3{
+
+			}
+			p{
+				font-family: 'Lato', sans-serif;
+				font-weight: 100;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="project">
+			<iframe src="https://player.vimeo.com/video/147610008" width="640" height="487" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+			<div id="description">
+				<h3>project title</h3>
+				<p>project description. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ratione voluptatem impedit fugit maxime accusantium. Dolor inventore blanditiis repellendus deserunt ipsam autem, excepturi ab aliquam reiciendis doloremque distinctio, optio, reprehenderit modi!</p>
+			</div>
+
+		</div>
+		<div id="logo">
+			<h1>rubberband.</h1>
+		</div>
+		<div id="tooltip-container">
+			<div id="tooltip">
+				<p></p>
+			</div>
+		</div>
+		<div id="nav">
+			<h2>about</h2>
+			<h2>contact</h2>
+		</div>
+		<div id="container">
+		</div>
+		<!-- // <script src="../common/scripts/js/three76.js"></script> -->
+		<script src="scripts/js/three.js"></script>
+		<script src="../common/scripts/js/CCapture.min.js"></script>
+		<script src="../common/scripts/js/gif.js"></script>
+		<script src="../common/scripts/js/OrbitControls.js"></script>
+		<script src="../common/scripts/js/Whammy.js"></script>
+		<script src="../common/scripts/js/Utils.js"></script>
+		<script src="../common/scripts/js/TweenMax.min.js"></script>
+		<script src="scripts/js/Detector.js"></script>
+		<script src="scripts/js/Rubberband.js"></script>
+		<script src="scripts/js/projects.js"></script>
+		<script src="scripts/js/traer.js"></script>
+		<script src="scripts/js/main.js"></script>
+	</body>
+</html>

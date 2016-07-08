@@ -10,12 +10,12 @@ function Rubberband(RENDERER, SCENE, CAMERA){
 		"textures/1.png",
 		"textures/2.png",
 		"textures/3.png",
-		"textures/1.png",
 		"textures/4.png",
 		"textures/5.png",
 		"textures/6.png",
 		"textures/7.png",
-		"textures/8.png"
+		"textures/8.png",
+		"textures/9.png"
 	]
 	this.textures = [];
 
@@ -220,6 +220,7 @@ function Rubberband(RENDERER, SCENE, CAMERA){
 					// this.markers[index].position.y = physics.particles[index].position.y;
 					// this.markers[index].position.z = physics.particles[index].position.z;
 				}			
+
 			}
 	    }
 	    this.setUniforms = function(UNIFORMS){

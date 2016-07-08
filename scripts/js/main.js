@@ -100,9 +100,9 @@ function init() {
     });
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize(renderSize.x, renderSize.y);
-    renderer.setClearColor(0xffffff, 1.0);
-    camera = new THREE.OrthographicCamera( renderSize.x / - 2, renderSize.x / 2, renderSize.y / 2, renderSize.y / - 2, -100000, 100000 );
-    // camera = new THREE.PerspectiveCamera(45, renderSize.x/renderSize.y, 0.01, 100000);
+    renderer.setClearColor(0x000000, 1.0);
+    // camera = new THREE.OrthographicCamera( renderSize.x / - 2, renderSize.x / 2, renderSize.y / 2, renderSize.y / - 2, -100000, 100000 );
+    camera = new THREE.PerspectiveCamera(45, renderSize.x/renderSize.y, 0.01, 100000);
     orthoCamera = new THREE.OrthographicCamera( renderSize.x / - 2, renderSize.x / 2, renderSize.y / 2, renderSize.y / - 2, -100000, 100000 );
 
     camera.position.z = 500;
@@ -195,7 +195,7 @@ function draw() {
         if ( INTERSECTED != intersects[ 0 ] ) {
             INTERSECTED = intersects[ 0 ];
             tooltip.style.display = "block";
-            tooltip.children[0].innerHTML = INTERSECTED.object.userData.title;
+            tooltip.children[0].innerHTML = "project " + INTERSECTED.object.userData.title;
         }
     } else {
         INTERSECTED = null;
@@ -212,7 +212,7 @@ function onMouseMove(event) {
     var x = event.clientX,
         y = event.clientY;
     tooltip.style.top = (y + 20) + 'px';
-    tooltip.style.left = (x + 20) + 'px';
+    tooltip.style.left = (x) + 'px';
 
     mouse.x = (event.clientX / renderSize.x) * 2 - 1;  
     mouse.y = -(event.clientY / renderSize.y) * 2 + 1;   
