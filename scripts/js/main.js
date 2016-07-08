@@ -72,9 +72,12 @@ var cursor2;
 var markerGeometry = new THREE.SphereGeometry(3,3,3);
 var markerMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, side: 2})
 var math = 0.0, prevMath = 0.0;
-var offset = new THREE.Vector3();
-var intersection = new THREE.Vector3();
+
 var plane = new THREE.Plane();
+var mouse = new THREE.Vector2(),
+offset = new THREE.Vector3(),
+intersection = new THREE.Vector3(),
+INTERSECTED, SELECTED;
 
 // physics.onUpdate(draw);
 init();
@@ -98,8 +101,8 @@ function init() {
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize(renderSize.x, renderSize.y);
     renderer.setClearColor(0xffffff, 1.0);
-    // camera = new THREE.OrthographicCamera( renderSize.x / - 2, renderSize.x / 2, renderSize.y / 2, renderSize.y / - 2, -100000, 100000 );
-    camera = new THREE.PerspectiveCamera(45, renderSize.x/renderSize.y, 0.01, 100000);
+    camera = new THREE.OrthographicCamera( renderSize.x / - 2, renderSize.x / 2, renderSize.y / 2, renderSize.y / - 2, -100000, 100000 );
+    // camera = new THREE.PerspectiveCamera(45, renderSize.x/renderSize.y, 0.01, 100000);
     orthoCamera = new THREE.OrthographicCamera( renderSize.x / - 2, renderSize.x / 2, renderSize.y / 2, renderSize.y / - 2, -100000, 100000 );
 
     camera.position.z = 500;
@@ -181,82 +184,23 @@ function draw() {
     uniforms["mouse"].x = mouse.x;
     uniforms["mouse"].y = mouse.y;
 
- rubberband.update();
+    rubberband.update();
 
     physics.tick();
 
-    // rubberband.setUniforms(uniforms);
+    raycaster.setFromCamera( mouse, camera );   
+    var intersects = raycaster.intersectObjects( scene.children );
 
-/*    // renderer.render(scene, orthoCamera, renderTarget);
-    // for ( var ii = 0; ii < views.length; ++ii ) {
-        view = views[0];
-        camera = view.camera;
-        // view.updateCamera( camera, scene, mouse.x, mouse.y );
-        var left   = Math.floor( renderSize.x  * view.left );
-        var bottom = Math.floor( renderSize.y * view.bottom );
-        var width  = Math.floor( renderSize.x  * view.width );
-        var height = Math.floor( renderSize.y * view.height );
-        renderer.setViewport( left, bottom, width, height );
-        renderer.setScissor( left, bottom, width, height );
-        renderer.setScissorTest( true );
-        // renderer.setClearColor( view.background );
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-
-        renderer.render( scene, camera );
-
-            
-        view = views[1];
-        camera = view.camera;
-        // view.updateCamera( camera, scene, mouse.x, mouse.y );
-        var left   = Math.floor( renderSize.x  * view.left );
-        var bottom = Math.floor( renderSize.y * view.bottom );
-        var width  = Math.floor( renderSize.x  * view.width );
-        var height = Math.floor( renderSize.y * view.height );
-        renderer.setViewport( left, bottom, width, height );
-        renderer.setScissor( left, bottom, width, height );
-        renderer.setScissorTest( true );
-        // renderer.setClearColor( view.background );
-        // camera.aspect = width / height;
-        camera.left = width/-2;
-        camera.right = width/2;
-        camera.top = height/2;
-        camera.bottom = height/-2;
-        camera.updateProjectionMatrix();
-        renderer.render( scene, camera );*/
-        raycaster.setFromCamera( mouse, camera );   
-        var intersects = raycaster.intersectObjects( scene.children );
-
-        // for ( var i = 0; i < intersects.length; i++ ) {
-        //     // intersects[ i ].object.material.color.set( 0xff0000 );
-        //     tooltip.style.display = "block";
-        //     tooltip.innerHTML = intersects[i].object.userData.title;
-        // }
-
-        if ( intersects.length > 0 ) {
-            if ( INTERSECTED != intersects[ 0 ] ) {
-                INTERSECTED = intersects[ 0 ];
-                // console.log(intersects[ 0 ]);
-                // var face = INTERSECTED.faceIndex + ((INTERSECTED.object.userData.title-1)*rubberband.segments[0].geometry.vertices.length);
-                // face /= 2;
-                // face = Math.floor(face);
-                // var half = face/rubberband.segments[0].geometry.vertices.length - (INTERSECTED.object.userData.title-1);
-                // if(face){
-                //         var portion = (physics.particles.length/(rubberband.segments.length*2.0));
-                //         var index = face + (INTERSECTED.object.userData.title-1)*portion;
-                //         physics.particles[index].position.x += Math.cos(time*10.0)*20.0;
-                //         physics.particles[index].position.z += Math.cos(time*10.0)*20.0;
-                //         physics.particles[index + portion].position.x += Math.cos(time*10.0)*10.0;
-                //         physics.particles[index + portion].position.z += Math.cos(time*10.0)*20.0                             
-                // }
-     
-                tooltip.style.display = "block";
-                tooltip.children[0].innerHTML = INTERSECTED.object.userData.title;
-            }
-        } else {
-            // INTERSECTED = null;
-            tooltip.style.display = "none";
+    if ( intersects.length > 0 ) {
+        if ( INTERSECTED != intersects[ 0 ] ) {
+            INTERSECTED = intersects[ 0 ];
+            tooltip.style.display = "block";
+            tooltip.children[0].innerHTML = INTERSECTED.object.userData.title;
         }
+    } else {
+        INTERSECTED = null;
+        tooltip.style.display = "none";
+    }
 
     renderer.render(scene, camera);
 
@@ -273,45 +217,71 @@ function onMouseMove(event) {
     mouse.x = (event.clientX / renderSize.x) * 2 - 1;  
     mouse.y = -(event.clientY / renderSize.y) * 2 + 1;   
 
-    raycasterMouse.x = ((event.clientX + views[0].left) / (renderSize.x)) * 2 - 1;  
-    raycasterMouse.y = -((event.clientY + views[0].bottom) / (renderSize.y)) * 2 + 1; 
-
-
-
-    // if ( INTERSECTED ) {
-
-
-        // return;
-
-    // }
     raycaster.setFromCamera( mouse, camera );
-
-    var intersects = raycaster.intersectObjects( scene.children );
-    if ( mouseDown ) {
+    if ( SELECTED ) {
 
         if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
 
-            // INTERSECTED.object.position.copy( intersection.sub( offset ) );
-            var pos = intersection.sub( offset );//.normalize();
-            // pos.multiplyScalar(50.0);
-            // physics.particles[FACEINDEX].position.x = pos.x;
-            // physics.particles[FACEINDEX].position.y += pos.y;
-            // physics.particles[FACEINDEX].position.z = pos.z;
-            // physics.particles[FACEINDEX + FACEPORTION].position.x = pos.x;
-            // physics.particles[FACEINDEX + FACEPORTION].position.y += pos.y;
-            // physics.particles[FACEINDEX + FACEPORTION].position.z = pos.z;
-
+            // SELECTED.object.position.copy( intersection.sub( offset ) );
+            var pos = intersection.sub( offset );
+            if(FACEINDEX){
+                physics.particles[FACEINDEX].position.x = pos.x;
+                physics.particles[FACEINDEX].position.y = pos.y + 32;
+                physics.particles[FACEINDEX].position.z = pos.z;
+                physics.particles[FACEINDEX + FACEPORTION].position.x = pos.x;
+                physics.particles[FACEINDEX + FACEPORTION].position.y = pos.y - 32;
+                physics.particles[FACEINDEX + FACEPORTION].position.z = pos.z;
+            }
         }
+
+        return;
+
+    }
+
+    var intersects = raycaster.intersectObjects( scene.children );
+
+    if ( intersects.length > 0 ) {
+
         if ( INTERSECTED != intersects[ 0 ] ) {
 
-            // INTERSECTED = intersects[ 0 ].object;
-            // INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+            // if ( INTERSECTED ) INTERSECTED.object.material.color.setHex( INTERSECTED.currentHex );
+
+            INTERSECTED = intersects[ 0 ];
+            // INTERSECTED.object.currentHex = INTERSECTED.object.material.color.getHex();
 
             plane.setFromNormalAndCoplanarPoint(
                 camera.getWorldDirection( plane.normal ),
-                 new THREE.Vector3(physics.particles[FACEINDEX].position.x, 0.0, physics.particles[FACEINDEX].position.z) );
+                new THREE.Vector3(physics.particles[FACEINDEX].position.x, 0.0, physics.particles[FACEINDEX].position.z)  );
 
         }
+
+        container.style.cursor = 'pointer';
+
+    } else {
+
+        // if ( INTERSECTED ) INTERSECTED.object.material.color.setHex( INTERSECTED.object.currentHex );
+
+        INTERSECTED = null;
+
+        container.style.cursor = 'auto';
+
+    }
+
+    if ( mouseDown ) {
+
+        // if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
+
+        //     // INTERSECTED.object.position.copy( intersection.sub( offset ) );
+        //     var pos = intersection.sub( offset );//.normalize();
+        //     pos.multiplyScalar(0.10);
+        //     physics.particles[FACEINDEX].position.x = pos.x;
+        //     // physics.particles[FACEINDEX].position.y += pos.y;
+        //     physics.particles[FACEINDEX].position.z = pos.z;
+        //     physics.particles[FACEINDEX + FACEPORTION].position.x = pos.x;
+        //     // physics.particles[FACEINDEX + FACEPORTION].position.y += pos.y;
+        //     physics.particles[FACEINDEX + FACEPORTION].position.z = pos.z;
+
+        // }
     }
 
 
@@ -355,41 +325,52 @@ function onMouseDown() {
     raycaster.setFromCamera( mouse, camera );   
     var intersects = raycaster.intersectObjects( scene.children );
     if ( intersects.length > 0 ) {
-        if ( INTERSECTED != intersects[ 0 ] ) {
-            INTERSECTED = intersects[ 0 ];
-            // console.log(intersects[ 0 ]);
-            var face = INTERSECTED.faceIndex + ((INTERSECTED.object.userData.title-1)*rubberband.segments[0].geometry.vertices.length);
-            face /= 2;
-            face = Math.floor(face);
-            var half = face/rubberband.segments[0].geometry.vertices.length - (INTERSECTED.object.userData.title-1);
-            if(face){
-                    var portion = (physics.particles.length/(rubberband.segments.length*2.0));
-                    var index = face + (INTERSECTED.object.userData.title-1)*portion;
-                    FACEINDEX = index;
-                    FACEPORTION = portion;
-                    // physics.particles[index].position.x += Math.cos(time*10.0)*20.0;
-                    // physics.particles[index].position.z += Math.cos(time*10.0)*20.0;
-                    // physics.particles[index + portion].position.x += Math.cos(time*10.0)*10.0;
-                    // physics.particles[index + portion].position.z += Math.cos(time*10.0)*20.0                             
-            }
-            if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
+        controls.enabled = false;
+        
+        SELECTED = intersects[ 0 ];
 
-                offset.copy( intersection ).sub( new THREE.Vector3(physics.particles[FACEINDEX].position.x, 0.0, physics.particles[FACEINDEX].position.z) );
-
-            }
-            tooltip.style.display = "block";
-            tooltip.children[0].innerHTML = INTERSECTED.object.userData.title;
+        // if ( SELECTED != intersects[ 0 ] ) {
+                // SELECTED = intersects[ 0 ];
+                // console.log(intersects[ 0 ]);
+        var face = SELECTED.faceIndex + ((SELECTED.object.userData.title-1)*rubberband.segments[0].geometry.vertices.length);
+        face /= 2;
+        face = Math.floor(face);
+        var half = face/rubberband.segments[0].geometry.vertices.length - (SELECTED.object.userData.title-1);
+        if(face){
+                var portion = (physics.particles.length/(rubberband.segments.length*2.0));
+                var index = face + (SELECTED.object.userData.title-1)*portion;
+                FACEINDEX = index;
+                FACEPORTION = portion;
+                // physics.particles[index].position.x += Math.cos(time*10.0)*20.0;
+                // physics.particles[index].position.z += Math.cos(time*10.0)*20.0;
+                // physics.particles[index + portion].position.x += Math.cos(time*10.0)*10.0;
+                // physics.particles[index + portion].position.z += Math.cos(time*10.0)*20.0                             
         }
+        if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
+
+            // offset.copy( intersection ).sub( SELECTED.object.position );
+            offset.copy( intersection ).sub( new THREE.Vector3(physics.particles[FACEINDEX].position.x, 0.0, physics.particles[FACEINDEX].position.z) );
+
+        }
+        tooltip.style.display = "block";
+        tooltip.children[0].innerHTML = SELECTED.object.userData.title;
+            // }
     } else {
-        INTERSECTED = null;
-        tooltip.style.display = "none";
+        // INTERSECTED = null;
+        // tooltip.style.display = "none";
     }  
 }
 function onMouseUp() {
     mouseDown = false;
 
-    math = 0;
-    prevMath = 0;
+    controls.enabled = true;
+    FACEINDEX = null;
+    if ( INTERSECTED ) {
+
+        SELECTED = null;
+
+    }
+
 }
 function onDocumentTouchStart(event) {
     updateMouse(event);

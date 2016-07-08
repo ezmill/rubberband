@@ -158,7 +158,7 @@ function Rubberband(RENDERER, SCENE, CAMERA){
 	    	for(var i = 0; i < this.segments.length; i++){
 		  		for(var j = 0; j < this.segments[i].geometry.vertices.length; j++){
 			  		physics.makeParticle(
-			  			6.0, 
+			  			10.0, 
 			  			this.segments[i].geometry.vertices[j].x, 
 			  			this.segments[i].geometry.vertices[j].y, 
 			  			this.segments[i].geometry.vertices[j].z
@@ -167,8 +167,8 @@ function Rubberband(RENDERER, SCENE, CAMERA){
 	    	}
 	    }
 	    this.createSprings = function(){
-	    	var strength   = 4.0;
-	    	var damping    = 4.0;
+	    	var strength   = 10.0;
+	    	var damping    = 0.1;
 	    	var restLength = 0.5;
 	    	for(var i = 0; i < this.segments.length; i++){
 	    		for(var j = 0; j < this.segments[i].geometry.vertices.length/2 - 1; j++){
