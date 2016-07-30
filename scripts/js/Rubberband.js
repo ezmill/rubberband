@@ -7,17 +7,20 @@ function Rubberband(RENDERER, SCENE, CAMERA){
 	this.markers = [];
 	this.mesh;
 	this.images = [
+		"textures/0.png",
 		"textures/1.png",
 		"textures/2.png",
 		"textures/3.png",
 		"textures/4.png",
 		"textures/5.png",
 		"textures/6.png",
-		"textures/7.png",
-		"textures/8.png",
-		"textures/9.png"
+		"textures/6.png",
+		"textures/5.png"
 	]
 	this.textures = [];
+	this.FACEINDEX;
+	this.FACEPORTION;
+	var projectTexture = loader.load(PATH + "textures/project.jpg");
 
 	    this.init = function(){
 			/*for(var i = 0; i < TAU; i += TAU/8.0){
@@ -68,8 +71,10 @@ function Rubberband(RENDERER, SCENE, CAMERA){
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 			texture.repeat = new THREE.Vector2(0.0,0.0);
 			material.uniforms["texture"].value = texture;
+			material.uniforms["projectTexture"].value = projectTexture;
 			material.uniforms["resolution"].value = renderSize;
-			material.uniforms["textureResolution"].value = new THREE.Vector2(1024.0, 1024.0);
+			material.uniforms["textureResolution"].value = new THREE.Vector2(2880.0, 1800.0);
+			material.uniforms["mouseOn"].value = 0.0;
 	  		var geometry = new THREE.CylinderGeometry(200,200, 64, 256*5.0, 1, true);
 	  		this.mesh = new THREE.Mesh(geometry, material);
 	  		geometry.computeBoundingSphere();
@@ -142,14 +147,19 @@ function Rubberband(RENDERER, SCENE, CAMERA){
     				vertexShader: shader.vertexShader,
     				fragmentShader: shader.fragmentShader,
     				transparent: true,
+    				opacity: 0.9,
     				side: 2
+    				// wireframe:true
     			})
     			material.uniforms["texture"].value = this.textures[i/TAU*8.0];
-    			material.uniforms["textureResolution"].value = new THREE.Vector2(1024.0, 1024.0);
+    			material.uniforms["textureResolution"].value = new THREE.Vector2(2880/2, 1800/2);
     			material.uniforms["resolution"].value = renderSize;
+    			material.uniforms["projectTexture"].value = projectTexture;
 		  		var mesh = new THREE.Mesh(geometry, material);
 		  		mesh.userData.title = projects[i/TAU*8.0].title;
-		  		mesh.scale.set(2.0,2.0,2.0);
+		  		mesh.userData.route = projects[i/TAU*8.0].route;
+		  		mesh.userData.index = projects[i/TAU*8.0].index;
+		  		mesh.scale.set(1.0,1.0,1.0);
 		  		this.scene.add(mesh);
 		  		this.segments.push(mesh);
 	    	}
@@ -168,8 +178,8 @@ function Rubberband(RENDERER, SCENE, CAMERA){
 	    }
 	    this.createSprings = function(){
 	    	var strength   = 10.0;
-	    	var damping    = 0.1;
-	    	var restLength = 0.5;
+	    	var damping    = 4.0;
+	    	var restLength = 0.5;//0.5;//;
 	    	for(var i = 0; i < this.segments.length; i++){
 	    		for(var j = 0; j < this.segments[i].geometry.vertices.length/2 - 1; j++){
 					var index = j + i*(physics.particles.length/this.segments.length);
@@ -206,12 +216,20 @@ function Rubberband(RENDERER, SCENE, CAMERA){
 	    	}
 
 	    }
+	    this.showEnds = function(){
+
+	    }
 	    this.update = function(){
-			vertIndex = vertIndex%physics.particles.length;
+			// vertIndex = vertIndex%(physics.particles.length/(this.segments.length*2.0));
 			for(var i = 0; i < this.segments.length; i++){
 				this.segments[i].geometry.verticesNeedUpdate = true;	
+				// this.segments[i].material.uniforms["mouseOn"].value = 0.0;
 				for(var j = 0; j < this.segments[i].geometry.vertices.length; j++){
 					var index = j + i*(physics.particles.length/this.segments.length);
+
+			        // console.log(portion);
+					// physics.particles[index + portion].position.x += Math.sin(time)*0.01;
+					// physics.particles[index + portion].position.z += Math.sin(time)*0.01;
 					// physics.particles[index].position.z += Math.sin(time*10.0 + this.segments[i].geometry.vertices[j].x*0.01);
 					this.segments[i].geometry.vertices[j].x = physics.particles[index].position.x;
 					this.segments[i].geometry.vertices[j].y = physics.particles[index].position.y;
@@ -222,6 +240,17 @@ function Rubberband(RENDERER, SCENE, CAMERA){
 				}			
 
 			}
+       		// var face = vertIndex + rubberband.segments[0].geometry.vertices.length;
+        	// face /= 2;
+        	// console.log(vertIndex/this.segments.length);
+        	// face = Math.floor(face);
+        	// var portion = (physics.particles.length/(this.segments.length*2.0));
+			// var index = face;// + (vertIndex/(this.segments.length))*portion;
+			// physics.particles[index].position.x += Math.sin(time)*20.0;
+			// physics.particles[index].position.z += Math.sin(time)*20.0;
+			// physics.particles[index + portion].position.x += Math.sin(time)*20.0;
+			// physics.particles[index + portion].position.z += Math.sin(time)*20.0;
+			// vertIndex++;
 	    }
 	    this.setUniforms = function(UNIFORMS){
 	    	for(u in UNIFORMS){
@@ -235,11 +264,14 @@ function RubberbandShader(){
     this.uniforms = THREE.UniformsUtils.merge([
 		{
 			"texture"  : { type: "t", value: null },
+			"projectTexture"  : { type: "t", value: null },
 			"mouse"  : { type: "v2", value: null },
 			"textureResolution"  : { type: "v2", value: null },
 			// "arcResolution"  : { type: "v2", value: null },
 			"resolution"  : { type: "v2", value: null },
 			"time"  : { type: "f", value: null },
+			"mouseOn"  : { type: "f", value: null },
+			"diffuseColor"  : { type: "v3", value: new THREE.Vector3(0.0,0.0,0.0) },
 		}
     ]);
     this.vertexShader = [
@@ -256,21 +288,37 @@ function RubberbandShader(){
     this.fragmentShader = [
         
 		"uniform sampler2D texture;",
+		"uniform sampler2D projectTexture;",
 		"uniform vec2 resolution;",
 		"uniform vec2 textureResolution;",
 		// "uniform vec2 arcResolution;",
 		"uniform vec2 mouse;",
+		"uniform vec3 diffuseColor;",
 		"uniform float time;",
+		"uniform float mouseOn;",
 		"varying vec2 vUv;",
 		"varying vec3 vNormal;",
 
 		"void main() {",
 		// "	vec2 uv = vUv;",
-        "   vec2 uv = ((vUv)*vec2(resolution.xy/textureResolution.xy)) - ((((vec2(0.0)- vec2(textureResolution.xy/resolution.xy))*0.5 + 0.5)*vec2(resolution.xy/textureResolution.xy)));",
-		"	uv.x *= resolution.x/resolution.y;",
-		"	vec4 color = texture2D(texture, vUv);",
+        "   vec2 uv = vUv;//((vUv)*vec2(resolution.xy/textureResolution.xy)) - ((((vec2(0.0)- vec2(textureResolution.xy/resolution.xy))*0.5 + 0.5)*vec2(resolution.xy/textureResolution.xy)));",
+		// "	uv.x *= resolution.x/resolution.y;",
+		"   vec4 rect = vec4(0.01, 0.01, 0.99, 0.99);",
+		"   vec2 hv = step(rect.xy, uv) * step(uv, rect.zw);",
+		"   float onOff = hv.x * hv.y;",
+		"	vec4 color = vec4(1.0);",
+		"	if(diffuseColor.r > 0.0){",
+   		"		color = mix(vec4(diffuseColor, 1.0), texture2D(texture, uv), onOff); // inner is visible",
+   		"	} else {",
+   		"		color = texture2D(texture, uv);",   		
+   		"	}",
+		"	vec4 projectColor = texture2D(projectTexture, vUv);",
 		// "	if(color.r > 0.5){",
-		"		gl_FragColor = vec4(color.rgb, color.a);",
+		// "	if(mouseOn > 0.0){",
+		// "		gl_FragColor = vec4(projectColor.rgb, 0.9);",
+		// "	} else {",
+		"		gl_FragColor = vec4(color.rgb, 0.9);",
+		// "	}",
 		// "	} else {",
 		// "		discard;",
 		// "	}",

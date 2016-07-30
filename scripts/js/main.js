@@ -16,7 +16,7 @@ var timeout;
 var assetCount = 0;
 var totalAssetCount = 4;
 var input;
-var FACEINDEX, FACEPORTION;
+var FACEINDEX = 0, FACEPORTION = 0;
 if ( ! Detector.webgl ){
     CREATEDWEBGL = false;
     Detector.addGetWebGLMessage();
@@ -64,7 +64,7 @@ var views = [
                 }
             ];
 var center = new THREE.Vector3(0.0,0.0,0.0);
-var physics = new ParticleSystem(0.0, 0.0, 0.0, 5.0);
+var physics = new ParticleSystem(0.0, 0.0, 0.0, 6.0);
 var vertIndex = 0;
 var vertIndex2 = 54;
 var cursor;
@@ -72,12 +72,17 @@ var cursor2;
 var markerGeometry = new THREE.SphereGeometry(3,3,3);
 var markerMaterial = new THREE.MeshBasicMaterial({color: 0xff0000, side: 2})
 var math = 0.0, prevMath = 0.0;
-
+var angle = 0.0;
+var angleY = 0.0;
 var plane = new THREE.Plane();
 var mouse = new THREE.Vector2(),
 offset = new THREE.Vector3(),
 intersection = new THREE.Vector3(),
 INTERSECTED, SELECTED;
+var pos = new THREE.Vector3();
+
+var lookAtPos = new THREE.Vector3(0.0,0.0,0.0);
+var targetLookAt = new THREE.Vector3(0.0,0.0,0.0);
 
 // physics.onUpdate(draw);
 init();
@@ -105,9 +110,12 @@ function init() {
     camera = new THREE.PerspectiveCamera(45, renderSize.x/renderSize.y, 0.01, 100000);
     orthoCamera = new THREE.OrthographicCamera( renderSize.x / - 2, renderSize.x / 2, renderSize.y / 2, renderSize.y / - 2, -100000, 100000 );
 
-    camera.position.z = 500;
-    camera.position.y = 200;
+    // camera.position.y = 100;
     camera.lookAt(new THREE.Vector3(0.0,0.0,0.0));
+    var angle = (Math.PI*2.0)/16.0;
+    var radius = 400.0;
+    camera.position.z = Math.cos(angle)*radius;
+    camera.position.x = Math.sin(angle)*radius;
 
     // for (var ii =  0; ii < views.length; ++ii ) {
     //     var view = views[ii];
@@ -126,6 +134,7 @@ function init() {
 
 
     controls = new THREE.OrbitControls(camera);
+    controls.enabled = false;
     // controls2 = new THREE.OrbitControls(orthoCamera);
     camera2 = new THREE.Camera();
     camera2.position.z = 1;
@@ -158,7 +167,7 @@ function init() {
     window.addEventListener("resize", debounceResize);
     document.addEventListener("mousemove", onMouseMove);
     document.addEventListener("mousedown", onMouseDown);
-    document.addEventListener("mouseup", onMouseUp);
+    // document.addEventListener("mouseup", onMouseUp);
     document.addEventListener('touchstart', onDocumentTouchStart, false);
     document.addEventListener('touchdown', onDocumentTouchStart, false);
     document.addEventListener('touchmove', onDocumentTouchMove, false);
@@ -195,12 +204,42 @@ function draw() {
         if ( INTERSECTED != intersects[ 0 ] ) {
             INTERSECTED = intersects[ 0 ];
             tooltip.style.display = "block";
-            tooltip.children[0].innerHTML = "project " + INTERSECTED.object.userData.title;
+            tooltip.children[0].innerHTML = "project " + INTERSECTED.object.userData.index;
         }
     } else {
         INTERSECTED = null;
         tooltip.style.display = "none";
     }
+
+    if(FACEINDEX){
+        // physics.particles[FACEINDEX].position.x = Math.sin(time)*200;
+        // physics.particles[FACEINDEX].position.y = pos.y + 32;
+        // physics.particles[FACEINDEX].position.z = Math.sin(time)*200;
+        // physics.particles[FACEINDEX + FACEPORTION].position.x = Math.sin(time)*200;
+        // physics.particles[FACEINDEX + FACEPORTION].position.y = pos.y - 32;
+        // physics.particles[FACEINDEX + FACEPORTION].position.z = Math.sin(time)*200;
+    }
+    // lookAtPos.x += (targetLookAt.x - lookAtPos.x)*0.1;
+    // lookAtPos.y += (targetLookAt.y - lookAtPos.y)*0.1;
+    // lookAtPos.z += (targetLookAt.z - lookAtPos.z)*0.1;
+    var radius = 500;
+    // var angle = 0.0;//mouse.x*Math.PI*2.0;//*Math.PI*2.0 - Math.PI;
+    // if(!mouseDown && (!SELECTED && !INTERSECTED)){
+        angle += (mouse.x*Math.PI*2.0 - angle)*0.01;        
+        angleY += (mouse.y*Math.PI - angleY)*0.01;        
+    // }
+    // camera.position.z += (Math.cos(angle)*radius - camera.position.z)*0.01;//Math.cos(Math.PI*2.0*mouse.x)*radius;//Math.cos(Math.PI*2.0*mouse.x)*radius;
+    camera.position.z = Math.cos(angle)*radius;
+    // camera.position.x += (Math.sin(angle)*radius - camera.position.x)*0.01;//Math.sin(Math.PI*2.0*mouse.x)*radius;//Math.sin(Math.PI*2.0*mouse.x)*radius;
+    // camera.position.y += (Math.sin(angle*0.5)*200 - camera.position.y)*0.01;//Math.sin(Math.PI*2.0*mouse.x)*radius;//Math.sin(Math.PI*2.0*mouse.x)*radius;
+    camera.position.x = Math.sin(angle)*radius;
+    camera.position.y = Math.sin(angleY)*400;
+    // camera.position.y = Math.sin(Math.PI*0.5*mouse.y)*radius;
+
+    camera.lookAt(new THREE.Vector3(0.0,0.0,0.0));
+    // pos.x += (400.0 - pos.x)*0.1;
+    // pos.y += (400.0 - pos.y)*0.1;
+    // pos.z += (400.0 - pos.z)*0.1;
 
     renderer.render(scene, camera);
 
@@ -217,12 +256,16 @@ function onMouseMove(event) {
     mouse.x = (event.clientX / renderSize.x) * 2 - 1;  
     mouse.y = -(event.clientY / renderSize.y) * 2 + 1;   
 
+    var angle = rotationIndex;
+    var radius = 400.0;
+    // camera.position.z = Math.cos(Math.PI*2.0*mouse.x)*radius;
+    // camera.position.x = Math.sin(Math.PI*2.0*mouse.x)*radius;
+    // camera.position.y = Math.cos(Math.PI*0.33*mouse.y)*radius - radius/2;
+
     raycaster.setFromCamera( mouse, camera );
-    if ( SELECTED ) {
-
+/*    if ( SELECTED ) {
+        SELECTED.object.material.uniforms["diffuseColor"].value = new THREE.Vector3(1.0,0.0,0.0);
         if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
-
-            // SELECTED.object.position.copy( intersection.sub( offset ) );
             var pos = intersection.sub( offset );
             if(FACEINDEX){
                 physics.particles[FACEINDEX].position.x = pos.x;
@@ -233,38 +276,58 @@ function onMouseMove(event) {
                 physics.particles[FACEINDEX + FACEPORTION].position.z = pos.z;
             }
         }
-
         return;
-
+    }*/
+    for(var i = 0; i < rubberband.segments.length;i++){
+        rubberband.segments[i].material.uniforms["diffuseColor"].value = new THREE.Vector3(0.0,0.0,0.0);
     }
-
     var intersects = raycaster.intersectObjects( scene.children );
-
     if ( intersects.length > 0 ) {
 
+        if(INTERSECTED)INTERSECTED.object.material.uniforms["diffuseColor"].value = new THREE.Vector3(1.0,1.0,1.0);
+        if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
+
+            // offset.copy( intersection ).sub( SELECTED.object.position );
+            offset.copy( intersection ).sub( new THREE.Vector3(physics.particles[FACEINDEX].position.x, 0.0, physics.particles[FACEINDEX].position.z) );
+
+        }
         if ( INTERSECTED != intersects[ 0 ] ) {
-
-            // if ( INTERSECTED ) INTERSECTED.object.material.color.setHex( INTERSECTED.currentHex );
-
             INTERSECTED = intersects[ 0 ];
-            // INTERSECTED.object.currentHex = INTERSECTED.object.material.color.getHex();
-
             plane.setFromNormalAndCoplanarPoint(
                 camera.getWorldDirection( plane.normal ),
                 new THREE.Vector3(physics.particles[FACEINDEX].position.x, 0.0, physics.particles[FACEINDEX].position.z)  );
-
+        }
+        var face = INTERSECTED.faceIndex + ((INTERSECTED.object.userData.index-1)*rubberband.segments[0].geometry.vertices.length);
+        face /= 2;
+        face = Math.floor(face);
+        var half = face/rubberband.segments[0].geometry.vertices.length - (INTERSECTED.object.userData.index-1);
+        if(face){
+                var portion = (physics.particles.length/(rubberband.segments.length*2.0));
+                var index = face + (INTERSECTED.object.userData.index-1)*portion;
+                FACEINDEX = index;
+                FACEPORTION = portion;
+                // physics.particles[index].position.x += Math.cos(time*10.0)*20.0;
+                // physics.particles[index].position.z += Math.cos(time*10.0)*20.0;
+                // physics.particles[index + portion].position.x += Math.cos(time*10.0)*10.0;
+                // physics.particles[index + portion].position.z += Math.cos(time*10.0)*20.0                             
+        }
+        if ( raycaster.ray.intersectPlane( plane, intersection ) ) {
+            pos = intersection;//.sub( offset );
+            if(FACEINDEX){
+                physics.particles[FACEINDEX].position.x += (pos.x - offset.x)*0.1;
+                physics.particles[FACEINDEX].position.y = pos.y + 32;
+                physics.particles[FACEINDEX].position.z += (pos.z - offset.z)*0.1;
+                physics.particles[FACEINDEX + FACEPORTION].position.x += (pos.x - offset.x)*0.1;
+                physics.particles[FACEINDEX + FACEPORTION].position.y = pos.y - 32;
+                physics.particles[FACEINDEX + FACEPORTION].position.z += (pos.z - offset.z)*0.1;
+            }
         }
 
         container.style.cursor = 'pointer';
-
     } else {
-
-        // if ( INTERSECTED ) INTERSECTED.object.material.color.setHex( INTERSECTED.object.currentHex );
-
+        if(INTERSECTED)INTERSECTED.object.material.uniforms["diffuseColor"].value = new THREE.Vector3(1.0,1.0,1.0);
         INTERSECTED = null;
-
         container.style.cursor = 'auto';
-
     }
 
     if ( mouseDown ) {
@@ -313,8 +376,15 @@ function onMouseMove(event) {
         physics.particles[FACEINDEX + FACEPORTION].position.add(dir);*/
     }
 }
+var rotationIndex = ((Math.PI*2.0)/16.0);
 function onMouseDown() {
-    mouseDown = true;
+/*    mouseDown = true;
+    rotationIndex += ((Math.PI*2.0)/8.0);
+    rotationIndex = rotationIndex%(Math.PI*2.0);
+    var angle = rotationIndex;
+    var radius = 400.0;
+    // camera.position.z = Math.cos(angle)*radius;
+    // camera.position.x = Math.sin(angle)*radius;
 
     mouse.x = (event.pageX / renderSize.x) * 2 - 1;  
     mouse.y = -(event.pageY / renderSize.y) * 2 + 1;    
@@ -329,16 +399,13 @@ function onMouseDown() {
         
         SELECTED = intersects[ 0 ];
 
-        // if ( SELECTED != intersects[ 0 ] ) {
-                // SELECTED = intersects[ 0 ];
-                // console.log(intersects[ 0 ]);
-        var face = SELECTED.faceIndex + ((SELECTED.object.userData.title-1)*rubberband.segments[0].geometry.vertices.length);
+        var face = SELECTED.faceIndex + ((SELECTED.object.userData.index-1)*rubberband.segments[0].geometry.vertices.length);
         face /= 2;
         face = Math.floor(face);
-        var half = face/rubberband.segments[0].geometry.vertices.length - (SELECTED.object.userData.title-1);
+        var half = face/rubberband.segments[0].geometry.vertices.length - (SELECTED.object.userData.index-1);
         if(face){
                 var portion = (physics.particles.length/(rubberband.segments.length*2.0));
-                var index = face + (SELECTED.object.userData.title-1)*portion;
+                var index = face + (SELECTED.object.userData.index-1)*portion;
                 FACEINDEX = index;
                 FACEPORTION = portion;
                 // physics.particles[index].position.x += Math.cos(time*10.0)*20.0;
@@ -353,20 +420,37 @@ function onMouseDown() {
 
         }
         tooltip.style.display = "block";
-        tooltip.children[0].innerHTML = SELECTED.object.userData.title;
+        tooltip.children[0].innerHTML = SELECTED.object.userData.index;
             // }
     } else {
         // INTERSECTED = null;
         // tooltip.style.display = "none";
-    }  
+    }  */
+    mouse.x = (event.pageX / renderSize.x) * 2 - 1;  
+
+    mouse.y = -(event.pageY / renderSize.y) * 2 + 1;    
+
+    raycaster.setFromCamera( mouse, camera );   
+
+    var intersects = raycaster.intersectObjects( scene.children );
+
+    if ( intersects.length > 0 ) {
+
+        SELECTED = intersects[ 0 ];
+        // console.log(SELECTED.object.userData); 
+        router.navigate("./" + SELECTED.object.userData.route);
+
+    } 
+
 }
 function onMouseUp() {
     mouseDown = false;
 
-    controls.enabled = true;
+    // controls.enabled = true;
+    
     FACEINDEX = null;
+    // if(SELECTED)SELECTED.object.material.uniforms["diffuseColor"].value = new THREE.Vector3(1.0,1.0,1.0);
     if ( INTERSECTED ) {
-
         SELECTED = null;
 
     }
@@ -391,6 +475,8 @@ function updateMouse(event) {
 function onWindowResize(event) {
     setRenderSize();
     renderer.setSize(renderSize.x, renderSize.y);
+    camera.aspect = renderSize.x/renderSize.y;
+    camera.updateProjectionMatrix();
     uniforms["resolution"] = new THREE.Vector2(renderSize.x, renderSize.y);
 
 }

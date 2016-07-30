@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8">
-		<link href="https://fonts.googleapis.com/css?family=Lato:100,300" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
 		<style>
 			@font-face{
 				font-family: "FrankGoth-BT";
@@ -12,7 +12,7 @@
 				background: black;
 				color: #fff;
 				font-size:16px;
-				font-family: "FrankGoth-BT";
+				font-family: 'VT323', monospace;
 				margin: 0px;
 			}
 			#logo{
@@ -23,11 +23,13 @@
 				margin: 0;
 				font-weight: normal;
 				letter-spacing: 1px;
+				font-family: "FrankGoth-BT";
+
 			}
 			#nav{
 				margin: 20px;
 				position: absolute;
-				bottom: 0; 
+				top: 0; 
 				right: 0;
 			}
 			#nav h2{
@@ -35,13 +37,13 @@
 				margin: 0 0 0 10px;
 				font-weight: normal;
 				letter-spacing: 1px;
-			}
+/**/			}
 			#container{
 				margin: 0 auto;
 				/*text-align: center;*/
 			}
 			#tooltip-container{
-
+				display: none;
 			}
 			#tooltip{
 				display: none;
@@ -61,7 +63,8 @@
 				width: 100vw;
 				height:100vh;
 				position: absolute;
-				background-color: rgba(0,0,0,0.25);
+				background-color: rgba(0,0,0,1.0);
+				display: none;
 			}
 			#project iframe{
 				position: absolute;
@@ -72,6 +75,7 @@
 				    -ms-transform: translate(-50%, -25%);
 				     -o-transform: translate(-50%, -25%);
 				        transform: translate(-50%, -25%);
+		        pointer-events: all;
 			}
 			#project #description{
 				position: absolute;
@@ -84,16 +88,55 @@
 				     -o-transform: translate(-50%, -90%);
 				        transform: translate(-50%, -90%);
 			}
+			#selector{
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				font-family: 'VT323', monospace;
+				background: black;
+				border: 1px solid white;
+				max-width: 15vw;
+				text-align: center;
+				padding: 5px;
+				margin: 20px;
+			}
+			#selector:hover{
+				background: white;
+			}
+			#selector:hover > h2{
+				color: black;
+			}
+			#selector h2{
+				line-height: 1em;
+				margin: 5px 0;
+			}
+			#selector img{
+				width: 50%;
+				height: auto;
+			}
+			a{
+				color: inherit;
+				text-decoration: none;
+			}
 			h3{
 
 			}
+			h2{
+				margin: 0 auto;
+			}
 			p{
-				font-family: 'Lato', sans-serif;
-				font-weight: 100;
+				font-family: 'VT323', monospace;
 			}
 		</style>
 	</head>
 	<body>
+		<div id="project">
+			<div id="description">
+				<h3>project title</h3>
+				<p>project description. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ratione voluptatem impedit fugit maxime accusantium. Dolor inventore blanditiis repellendus deserunt ipsam autem, excepturi ab aliquam reiciendis doloremque distinctio, optio, reprehenderit modi!</p>
+			</div>
+
+		</div>
 		<div id="logo">
 			<h1>rubberband.</h1>
 		</div>
@@ -102,15 +145,23 @@
 				<p></p>
 			</div>
 		</div>
-
+	
 		<div id="nav">
 			<h2>about</h2>
 			<h2>contact</h2>
 		</div>
+<!-- 		<a href="#">
+			<div id="selector">
+				<img src="img/1.png" alt="">
+				<h2>click to view project</h2>
+			</div>
+		</a> -->
 		<div id="container">
 		</div>
 		<!-- // <script src="../common/scripts/js/three76.js"></script> -->
 		<script src="scripts/js/three.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="navigo/lib/navigo.min.js"></script>
 		<script src="../common/scripts/js/CCapture.min.js"></script>
 		<script src="../common/scripts/js/gif.js"></script>
 		<script src="../common/scripts/js/OrbitControls.js"></script>
@@ -118,9 +169,10 @@
 		<script src="../common/scripts/js/Utils.js"></script>
 		<script src="../common/scripts/js/TweenMax.min.js"></script>
 		<script src="scripts/js/Detector.js"></script>
-		<script src="scripts/js/Rubberband.js"></script>
 		<script src="scripts/js/projects.js"></script>
+		<script src="scripts/js/Rubberband.js"></script>
 		<script src="scripts/js/traer.js"></script>
+		<script src="scripts/js/router.js"></script>
 		<script src="scripts/js/main.js"></script>
 	</body>
 </html>
